@@ -8,16 +8,32 @@ import cartRouter from "../routes/cartRoute";
 
 const app = express();
 
-app.use(cors());
+// Configuración de CORS
+app.use(
+  cors({
+    origin: "*", // Reemplaza con el dominio de tu frontend
+    methods: "GET, POST, PUT, DELETE", // Métodos HTTP permitidos
+    allowedHeaders: "Content-Type, Authorization", // Encabezados permitidos
+    credentials: true, // Permite el uso de cookies y autenticación en las solicitudes
+  })
+);
+
+// Middleware para parsear el cuerpo de las solicitudes como JSON
 app.use(express.json());
 
-// Definir rutas
+// Rutas para las diferentes secciones de la API
 app.use("/api/food", foodRouter);
 app.use("/api/user", userRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/cart", cartRouter);
 
-// Definir ruta estática para imágenes
-app.use("/images", express.static("uploads"));
+// Ruta estática para servir las imágenes
+app.use("/uploads", express.static("uploads"));
+
+// Configuración del puerto
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 export default app;
