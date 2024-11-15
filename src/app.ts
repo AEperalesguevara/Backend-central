@@ -10,10 +10,14 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Definir rutas
 app.use("/api/food", foodRouter);
-app.use("/images", express.static("uploads"));
 app.use("/api/user", userRouter);
-app.use("/api/order",orderRouter);
-app.use("/uploads", express.static("uploads"));
+app.use("/api/order", orderRouter);
 app.use("/api/cart", cartRouter);
+
+// Definir ruta estática para imágenes
+app.use("/images", express.static("uploads"));
+
 export default app;
