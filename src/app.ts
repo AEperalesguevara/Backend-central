@@ -13,7 +13,6 @@ app.use(
   cors({
     origin: "https://centralrestaurant.vercel.app/", // Reemplaza con el dominio de tu frontend
     methods: "GET, POST, PUT, DELETE", // Métodos HTTP permitidos
-    allowedHeaders: "Content-Type, Authorization", // Encabezados permitidos
     credentials: true, // Permite el uso de cookies y autenticación en las solicitudes
   })
 );
