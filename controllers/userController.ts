@@ -1,68 +1,79 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { findUserByEmail, createUser } from "../models/userModel";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
 
-//login user
-// login user
-export const loginUser = async (req: Request, res: Response) => {
+// Login de usuario
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { email, password } = req.body;
   try {
     const user = await findUserByEmail(email);
 
     if (!user) {
-      return res.json({ success: false, message: "User doesn't exist" });
+      res.status(404).json({ success: false, message: "User doesn't exist" });
+      return;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.json({ success: false, message: "Invalid credentials" });
+      res.status(401).json({ success: false, message: "Invalid credentials" });
+      return;
     }
 
     const token = createToken(user.id);
 
-    // Devuelve el userId junto con el token
-    res.json({ success: true, token, userId: user.id });  // Aquí está la modificación
-
+    res.json({ success: true, token, userId: user.id });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.error("Error in loginUser:", error);
+    next(error);
   }
 };
 
-const createToken = (id: number) => {
+// Función para crear token
+const createToken = (id: number): string => {
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
     throw new Error("JWT_SECRET is not defined in the environment variables");
   }
 
-  return jwt.sign({ id }, secret as string);
+  return jwt.sign({ id }, secret);
 };
 
-//register user
-export const registerUser = async (req: Request, res: Response) => {
+// Registro de usuario
+export const registerUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { name, password, email } = req.body;
+
   try {
     const exists = await findUserByEmail(email);
+
     if (exists) {
-      return res.json({ success: false, message: "User already exists" });
+      res.status(409).json({ success: false, message: "User already exists" });
+      return;
     }
 
     if (!validator.isEmail(email)) {
-      return res.json({
-        success: false,
-        message: "Please enter a valid email",
-      });
+      res
+        .status(400)
+        .json({ success: false, message: "Please enter a valid email" });
+      return;
     }
 
     if (password.length < 8) {
-      return res.json({
-        success: false,
-        message: "Please enter a strong password",
-      });
+      res
+        .status(400)
+        .json({ success: false, message: "Please enter a strong password" });
+      return;
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -70,9 +81,10 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const user = await createUser(name, email, hashedPassword);
     const token = createToken(user.id);
+
     res.json({ success: true, token });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.error("Error in registerUser:", error);
+    next(error);
   }
 };
