@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../config/db";
 import fs from "fs";
+import cloudinary from "../config/cloudinary";
 
 // Listar todos los alimentos
 export const listFood = async (
@@ -51,13 +52,22 @@ export const addFood = async (
       return;
     }
 
+    // Subir imagen a Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "menu_images", // Carpeta en Cloudinary
+      use_filename: true,
+    });
+
+    console.log("Imagen subida a Cloudinary:", result);
+
+    // Crear el producto en la base de datos con la URL de Cloudinary
     const food = await prisma.food.create({
       data: {
         name: req.body.name,
         description: req.body.description,
         price: price,
         category: req.body.category,
-        image: req.file.filename,
+        image: result.secure_url, // URL pública de la imagen
       },
     });
 
