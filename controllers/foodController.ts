@@ -13,6 +13,7 @@ export const listFood = async (
     const foods = await prisma.food.findMany();
     res.json({ success: true, data: foods });
   } catch (error) {
+    console.error("Error en listFood:", error);
     next(error);
   }
 };
@@ -28,7 +29,6 @@ export const addFood = async (
     console.log("Archivo recibido:", req.file);
 
     if (!req.file) {
-      console.log("Error: No se ha subido ningún archivo.");
       res
         .status(400)
         .json({ success: false, message: "Image file is required." });
@@ -36,7 +36,6 @@ export const addFood = async (
     }
 
     if (!req.body.name || !req.body.price || !req.body.category) {
-      console.log("Error: Faltan campos obligatorios.");
       res
         .status(400)
         .json({ success: false, message: "All fields are required." });
@@ -45,7 +44,6 @@ export const addFood = async (
 
     const price = parseFloat(req.body.price);
     if (isNaN(price)) {
-      console.log("Error: El precio no es un número válido.");
       res
         .status(400)
         .json({ success: false, message: "Price must be a valid number." });
@@ -53,12 +51,29 @@ export const addFood = async (
     }
 
     // Subir imagen a Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "menu_images", // Carpeta en Cloudinary
-      use_filename: true,
-    });
+    let imageUrl = "";
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "menu_images",
+        use_filename: true,
+      });
 
-    console.log("Imagen subida a Cloudinary:", result);
+      imageUrl = result.secure_url;
+
+      // Eliminar el archivo local después de subirlo
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.error("Error al eliminar el archivo local:", err);
+        }
+      });
+    } catch (cloudinaryError) {
+      console.error("Error subiendo a Cloudinary:", cloudinaryError);
+      res.status(500).json({
+        success: false,
+        message: "Error uploading image to Cloudinary",
+      });
+      return;
+    }
 
     // Crear el producto en la base de datos con la URL de Cloudinary
     const food = await prisma.food.create({
@@ -67,13 +82,13 @@ export const addFood = async (
         description: req.body.description,
         price: price,
         category: req.body.category,
-        image: result.secure_url, // URL pública de la imagen
+        image: imageUrl, // Aseguramos que se guarde la URL de Cloudinary
       },
     });
 
     res.json({ success: true, message: "Food Added", data: food });
   } catch (error) {
-    console.log("Error en el servidor:", error);
+    console.error("Error en addFood:", error);
     next(error);
   }
 };
@@ -100,11 +115,18 @@ export const removeFood = async (
     }
 
     if (food.image) {
-      fs.unlink(`uploads/${food.image}`, (err) => {
-        if (err) {
-          console.error("Error al eliminar el archivo:", err);
+      // Extraer el public_id de la URL de Cloudinary
+      const publicId = food.image.split("/").pop()?.split(".")[0];
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(`menu_images/${publicId}`);
+        } catch (cloudinaryError) {
+          console.error(
+            "Error eliminando imagen de Cloudinary:",
+            cloudinaryError
+          );
         }
-      });
+      }
     }
 
     await prisma.food.delete({ where: { id: foodId } });
