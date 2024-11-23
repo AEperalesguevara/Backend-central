@@ -51,3 +51,18 @@ export const createReservation = async (
     next(error);
   }
 };
+
+// Obtener todas las reservas
+export const getReservations = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const reservations = await prisma.reservation.findMany();
+    res.status(200).json({ success: true, reservations });
+  } catch (error) {
+    console.error("Error al obtener reservas:", error);
+    next(error);
+  }
+};

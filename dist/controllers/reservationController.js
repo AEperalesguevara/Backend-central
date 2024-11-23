@@ -12,17 +12,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getReservations = exports.createReservation = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
-// Crear una nueva reserva
 const createReservation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, phone, date, time, guests } = req.body;
     try {
         // Validaciones básicas
-        if (!name || !email || !phone || !date || !time || !guests) {
-            res
-                .status(400)
-                .json({
+        if (!name || !email || !phone || !date || !time || guests === undefined) {
+            res.status(400).json({
                 success: false,
                 message: "Todos los campos son obligatorios.",
+            });
+            return;
+        }
+        // Validación adicional para 'guests'
+        const guestsNumber = parseInt(guests, 10);
+        if (isNaN(guestsNumber) || guestsNumber < 1 || guestsNumber > 20) {
+            res.status(400).json({
+                success: false,
+                message: "El número de comensales debe ser un número entre 1 y 20.",
             });
             return;
         }
@@ -34,7 +40,7 @@ const createReservation = (req, res, next) => __awaiter(void 0, void 0, void 0, 
                 phone,
                 date: new Date(date),
                 time,
-                guests,
+                guests: guestsNumber,
             },
         });
         res.status(201).json({
