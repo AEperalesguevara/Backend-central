@@ -14,12 +14,10 @@ export const createReservation = async (
   try {
     // Validaciones básicas
     if (!name || !email || !phone || !date || !time || !guests) {
-      res
-        .status(400)
-        .json({
-          success: false,
-          message: "Todos los campos son obligatorios.",
-        });
+      res.status(400).json({
+        success: false,
+        message: "Todos los campos son obligatorios.",
+      });
       return;
     }
 
@@ -31,7 +29,7 @@ export const createReservation = async (
         phone,
         date: new Date(date),
         time,
-        guests,
+        guests: parseInt(guests, 10),
       },
     });
 
