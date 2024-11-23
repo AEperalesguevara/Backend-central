@@ -2,8 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
-// Crear una nueva reserva
 export const createReservation = async (
   req: Request,
   res: Response,
@@ -13,10 +11,20 @@ export const createReservation = async (
 
   try {
     // Validaciones básicas
-    if (!name || !email || !phone || !date || !time || !guests) {
+    if (!name || !email || !phone || !date || !time || guests === undefined) {
       res.status(400).json({
         success: false,
         message: "Todos los campos son obligatorios.",
+      });
+      return;
+    }
+
+    // Validación adicional para 'guests'
+    const guestsNumber = parseInt(guests, 10);
+    if (isNaN(guestsNumber) || guestsNumber < 1 || guestsNumber > 20) {
+      res.status(400).json({
+        success: false,
+        message: "El número de comensales debe ser un número entre 1 y 20.",
       });
       return;
     }
@@ -29,7 +37,7 @@ export const createReservation = async (
         phone,
         date: new Date(date),
         time,
-        guests: parseInt(guests, 10),
+        guests: guestsNumber,
       },
     });
 
@@ -40,21 +48,6 @@ export const createReservation = async (
     });
   } catch (error) {
     console.error("Error al crear la reserva:", error);
-    next(error);
-  }
-};
-
-// Obtener todas las reservas
-export const getReservations = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const reservations = await prisma.reservation.findMany();
-    res.status(200).json({ success: true, reservations });
-  } catch (error) {
-    console.error("Error al obtener reservas:", error);
     next(error);
   }
 };
