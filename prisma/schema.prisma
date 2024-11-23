@@ -40,3 +40,14 @@ model Order {
   date     DateTime @default(now())
   payment  Boolean  @default(false)
 }
+
+model Reservation {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String
+  date      DateTime
+  time      String
+  guests    Int
+  createdAt DateTime @default(now())
+}

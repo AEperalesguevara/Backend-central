@@ -2,9 +2,10 @@ import express from "express";
 import cors from "cors";
 import foodRouter from "../routes/foodRoute";
 import userRouter from "../routes/userRoute";
-import "dotenv/config";
 import orderRouter from "../routes/orderRoute";
 import cartRouter from "../routes/cartRoute";
+import reservationRouter from "../routes/reservationRoute"; // Importa el nuevo router
+import "dotenv/config";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/food", foodRouter);
 app.use("/api/user", userRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/cart", cartRouter);
+app.use("/api/reservation", reservationRouter); // Agrega el nuevo router
 
 // Ruta estática para servir las imágenes
 app.use("/uploads", express.static("uploads"));
