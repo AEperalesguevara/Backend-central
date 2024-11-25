@@ -138,7 +138,8 @@ const updateStatus = async (
     next(error);
   }
 };
-const verifyOrder = async (req: Request, res: Response) => {
+
+const verifyOrder = async (req: Request, res: Response): Promise<void> => {
   const { orderId, success } = req.body;
 
   try {
@@ -146,7 +147,7 @@ const verifyOrder = async (req: Request, res: Response) => {
     const parsedOrderId = parseInt(orderId, 10);
 
     if (isNaN(parsedOrderId)) {
-      return res.json({ success: false, message: "Invalid order ID" });
+      res.json({ success: false, message: "Invalid order ID" });
     }
 
     if (success === "true") {
