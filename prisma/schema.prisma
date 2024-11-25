@@ -28,6 +28,7 @@ model User {
   email     String  @unique
   password  String
   cartData  Json?   @default("{}") // Guardamos como JSON en lugar de Object
+  role      String  @default("user")
 }
 
 model Order {
