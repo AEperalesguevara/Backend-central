@@ -45,6 +45,11 @@ export const loginUser = async (
       token,
       role: user.role, // Incluye el rol también en la respuesta
     });
+    console.log("Respuesta del login:", {
+      success: true,
+      token,
+      role: user.role,
+    });
   } catch (error) {
     console.error("Error in loginUser:", error);
     next(error);
