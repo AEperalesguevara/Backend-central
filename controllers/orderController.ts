@@ -144,17 +144,17 @@ const verifyOrder = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { orderId, success } = req.body;
+  const { success, orderId } = req.query; // Usamos req.query para obtener parámetros de la URL
   try {
     if (success === "true") {
       await prisma.order.update({
-        where: { id: orderId },
+        where: { id: Number(orderId) }, // Asegúrate de convertir orderId a un número
         data: { payment: true },
       });
       res.json({ success: true, message: "Paid" });
     } else {
       await prisma.order.delete({
-        where: { id: orderId },
+        where: { id: Number(orderId) },
       });
       res.json({ success: false, message: "Not Paid" });
     }
