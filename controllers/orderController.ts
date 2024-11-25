@@ -10,7 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 // Configuración de variables
 const currency = "usd";
 const deliveryCharge = 5;
-const frontend_URL = "http://localhost:5173";
+const frontend_URL = "https://frontend-restaurant-iota.vercel.app";
 type Item = {
   name: string;
   price: number;
