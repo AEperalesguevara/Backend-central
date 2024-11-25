@@ -6,8 +6,10 @@ import orderRouter from "../routes/orderRoute";
 import cartRouter from "../routes/cartRoute";
 import reservationRouter from "../routes/reservationRoute"; // Importa el nuevo router
 import "dotenv/config";
+import connectCloudinary from "../config/cloudinary";
 
 const app = express();
+connectCloudinary();
 
 // Configuración de CORS
 app.use(

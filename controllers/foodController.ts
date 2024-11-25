@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../config/db";
 import fs from "fs";
-import cloudinary from "../config/cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
 // Listar todos los alimentos
 export const listFood = async (
