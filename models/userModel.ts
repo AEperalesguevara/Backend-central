@@ -11,14 +11,16 @@ export const findUserByEmail = async (email: string) => {
 export const createUser = async (
   name: string,
   email: string,
-  password: string
+  password: string,
+  role: string = "user" // Definir un valor por defecto, como "user"
 ) => {
   return await prisma.user.create({
     data: {
       name,
       email,
       password,
-      cartData: {}, // Usando el campo JSON por defecto
+      role, // Agregar el campo role
+      cartData: {}, // Si usas un campo JSON, lo mantienes igual
     },
   });
 };

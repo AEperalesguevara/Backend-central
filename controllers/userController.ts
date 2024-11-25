@@ -4,7 +4,17 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
 
-// Login de usuario
+const createToken = (id: number, role: string): string => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("JWT_SECRET is not defined in the environment variables");
+  }
+
+  // Agregar el rol al payload del token
+  return jwt.sign({ id, role }, secret, { expiresIn: "1h" }); // 'role' ahora está incluido en el token
+};
+
 export const loginUser = async (
   req: Request,
   res: Response,
@@ -26,24 +36,19 @@ export const loginUser = async (
       return;
     }
 
-    const token = createToken(user.id);
+    // Aquí generas el token con el 'role' incluido
+    const token = createToken(user.id, user.role);
 
-    res.json({ success: true, token, userId: user.id });
+    // Responder con el token y el rol
+    res.json({
+      success: true,
+      token,
+      role: user.role, // Incluye el rol también en la respuesta
+    });
   } catch (error) {
     console.error("Error in loginUser:", error);
     next(error);
   }
-};
-
-// Función para crear token
-const createToken = (id: number): string => {
-  const secret = process.env.JWT_SECRET;
-
-  if (!secret) {
-    throw new Error("JWT_SECRET is not defined in the environment variables");
-  }
-
-  return jwt.sign({ id }, secret);
 };
 
 // Registro de usuario
@@ -79,8 +84,9 @@ export const registerUser = async (
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await createUser(name, email, hashedPassword);
-    const token = createToken(user.id);
+    // Aquí pasas "user" como rol predeterminado
+    const user = await createUser(name, email, hashedPassword, "user");
+    const token = createToken(user.id, "user");
 
     res.json({ success: true, token });
   } catch (error) {
