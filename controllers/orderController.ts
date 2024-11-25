@@ -138,28 +138,32 @@ const updateStatus = async (
     next(error);
   }
 };
+const verifyOrder = async (req: Request, res: Response) => {
+  const { orderId, success } = req.body;
 
-const verifyOrder = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  const { success, orderId } = req.query; // Usamos req.query para obtener parámetros de la URL
   try {
+    // Convertir orderId a un número
+    const parsedOrderId = parseInt(orderId, 10);
+
+    if (isNaN(parsedOrderId)) {
+      return res.json({ success: false, message: "Invalid order ID" });
+    }
+
     if (success === "true") {
       await prisma.order.update({
-        where: { id: Number(orderId) }, // Asegúrate de convertir orderId a un número
+        where: { id: parsedOrderId },
         data: { payment: true },
       });
       res.json({ success: true, message: "Paid" });
     } else {
       await prisma.order.delete({
-        where: { id: Number(orderId) },
+        where: { id: parsedOrderId },
       });
       res.json({ success: false, message: "Not Paid" });
     }
   } catch (error) {
-    next(error);
+    console.error(error);
+    res.json({ success: false, message: "Not Verified" });
   }
 };
 
