@@ -18,13 +18,15 @@ const findUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* (
     });
 });
 exports.findUserByEmail = findUserByEmail;
-const createUser = (name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = (name_1, email_1, password_1, ...args_1) => __awaiter(void 0, [name_1, email_1, password_1, ...args_1], void 0, function* (name, email, password, role = "user" // Definir un valor por defecto, como "user"
+) {
     return yield prisma.user.create({
         data: {
             name,
             email,
             password,
-            cartData: {}, // Usando el campo JSON por defecto
+            role, // Agregar el campo role
+            cartData: {}, // Si usas un campo JSON, lo mantienes igual
         },
     });
 });

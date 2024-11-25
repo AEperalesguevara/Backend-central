@@ -22,7 +22,7 @@ const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY || "", {
 // Configuración de variables
 const currency = "usd";
 const deliveryCharge = 5;
-const frontend_URL = "http://localhost:5173";
+const frontend_URL = "https://frontend-restaurant-iota.vercel.app";
 const placeOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newOrder = yield prisma.order.create({

@@ -17,7 +17,14 @@ const userModel_1 = require("../models/userModel");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const validator_1 = __importDefault(require("validator"));
-// Login de usuario
+const createToken = (id, role) => {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error("JWT_SECRET is not defined in the environment variables");
+    }
+    // Agregar el rol al payload del token
+    return jsonwebtoken_1.default.sign({ id, role }, secret, { expiresIn: "1h" }); // 'role' ahora está incluido en el token
+};
 const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     try {
@@ -31,8 +38,19 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
             res.status(401).json({ success: false, message: "Invalid credentials" });
             return;
         }
-        const token = createToken(user.id);
-        res.json({ success: true, token, userId: user.id });
+        // Aquí generas el token con el 'role' incluido
+        const token = createToken(user.id, user.role);
+        // Responder con el token y el rol
+        res.json({
+            success: true,
+            token,
+            role: user.role, // Incluye el rol también en la respuesta
+        });
+        console.log("Respuesta del login:", {
+            success: true,
+            token,
+            role: user.role,
+        });
     }
     catch (error) {
         console.error("Error in loginUser:", error);
@@ -40,14 +58,6 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.loginUser = loginUser;
-// Función para crear token
-const createToken = (id) => {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-        throw new Error("JWT_SECRET is not defined in the environment variables");
-    }
-    return jsonwebtoken_1.default.sign({ id }, secret);
-};
 // Registro de usuario
 const registerUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, password, email } = req.body;
@@ -71,8 +81,9 @@ const registerUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         }
         const salt = yield bcrypt_1.default.genSalt(10);
         const hashedPassword = yield bcrypt_1.default.hash(password, salt);
-        const user = yield (0, userModel_1.createUser)(name, email, hashedPassword);
-        const token = createToken(user.id);
+        // Aquí pasas "user" como rol predeterminado
+        const user = yield (0, userModel_1.createUser)(name, email, hashedPassword, "user");
+        const token = createToken(user.id, "user");
         res.json({ success: true, token });
     }
     catch (error) {
