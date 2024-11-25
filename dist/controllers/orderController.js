@@ -123,25 +123,31 @@ const updateStatus = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.updateStatus = updateStatus;
-const verifyOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const verifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { orderId, success } = req.body;
     try {
+        // Convertir orderId a un número
+        const parsedOrderId = parseInt(orderId, 10);
+        if (isNaN(parsedOrderId)) {
+            return res.json({ success: false, message: "Invalid order ID" });
+        }
         if (success === "true") {
             yield prisma.order.update({
-                where: { id: orderId },
+                where: { id: parsedOrderId },
                 data: { payment: true },
             });
             res.json({ success: true, message: "Paid" });
         }
         else {
             yield prisma.order.delete({
-                where: { id: orderId },
+                where: { id: parsedOrderId },
             });
             res.json({ success: false, message: "Not Paid" });
         }
     }
     catch (error) {
-        next(error);
+        console.error(error);
+        res.json({ success: false, message: "Not Verified" });
     }
 });
 exports.verifyOrder = verifyOrder;
