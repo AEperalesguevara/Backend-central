@@ -3,213 +3,147 @@
 
 ## Descripción
 
-Este proyecto es una API para la gestión de alimentos (Food API). Permite realizar operaciones como agregar, listar y eliminar alimentos. 
-La API está construida utilizando **Node.js**, **Express**, y **Prisma** como ORM para la base de datos **PostgreSQL**. 
-El proyecto también soporta la subida de imágenes asociadas a los alimentos y su eliminación del servidor.
+Este proyecto es una **API para la gestión de un Restaurante - Ecommerce**. Permite realizar operaciones como agregar, listar y eliminar alimentos, además de gestionar órdenes, reservas, y usuarios.
+La API está construida utilizando **Node.js**, **Express**, y **Prisma** como ORM para interactuar con una base de datos **PostgreSQL**. También soporta la **subida de imágenes** asociadas a los alimentos mediante **Multer** y **Cloudinary**.
 
 ## Características
 
-- **Agregar alimentos**: Crea un nuevo alimento con su información y su imagen correspondiente.
-- **Listar alimentos**: Devuelve una lista de todos los alimentos en la base de datos.
-- **Eliminar alimentos**: Elimina un alimento por su ID, incluyendo la eliminación de la imagen asociada.
+- **Gestión de platillos**: Agregar, listar y eliminar diferentes platos con sus respectivas imágenes.
+- **Gestión de usuarios**: Registro y autenticación de usuarios.
+- **Órdenes y reservas**: Crear y administrar pedidos y reservas.
+- **Subida de imágenes**: Carga y gestión de imágenes utilizando Multer y Cloudinary.
+-**Envio de Correos**: Envio automatico de correos al hacer una reserva.
 
 ## Tecnologías Utilizadas
 
 - **Node.js**: Entorno de ejecución de JavaScript en el servidor.
-- **Express**: Framework para la creación de aplicaciones web y APIs.
+- **Express**: Framework para crear aplicaciones web y APIs.
 - **Prisma**: ORM para manejar la base de datos PostgreSQL.
 - **PostgreSQL**: Sistema de gestión de bases de datos relacional.
 - **Multer**: Middleware para la subida de archivos.
-- **TypeScript**: Superconjunto de JavaScript que añade tipado estático.
+- **Cloudinary**: Servicio de almacenamiento de imágenes en la nube.
+- **TypeScript**: Superconjunto de JavaScript con tipado estático.
 
 ## Requisitos
 
-- **Node.js** (versión 14 o superior)
+- **Node.js** (versión 18 o superior)
 - **PostgreSQL** (versión 13 o superior)
-- **DBeaver** (opcional, para la visualización de la base de datos)
 - **Prisma CLI**: Para manejar la base de datos y los modelos.
+- **Cloudinary Account**: Para almacenar imágenes en la nube.
 
 ## Instalación
 
-1. Clonar el repositorio:
+1. Clona el repositorio:
 
    ```bash
-   git clone https://github.com/tu_usuario/food-api.git
+   git clone https://github.com/JohanEmersonPinares/Backend
    ```
 
-2. Instalar las dependencias:
+2. Instala las dependencias:
 
    ```bash
    cd food-api
    npm install
    ```
 
-3. Configurar las variables de entorno. Crear un archivo `.env` en la raíz del proyecto con la siguiente información:
+3. Configura las variables de entorno. Crea un archivo `.env` en la raíz del proyecto con la siguiente información:
 
    ```env
    DATABASE_URL="postgresql://usuario:password@localhost:5432/restaurant-db"
+   CLOUDINARY_CLOUD_NAME="tu_cloud_name"
+   CLOUDINARY_API_KEY="tu_api_key"
+   CLOUDINARY_API_SECRET="tu_api_secret"
+
+Ademas se requieren las variables de entorno de Stripe y del Nodeemailer
    ```
 
-4. Ejecutar las migraciones de Prisma para crear las tablas en la base de datos:
+4. Ejecuta las migraciones de Prisma para crear las tablas en la base de datos:
 
    ```bash
    npx prisma migrate dev --name init
    ```
 
-5. Iniciar el servidor:
+5. Inicia el servidor:
 
    ```bash
    npm run dev
    ```
 
-6. El servidor debería estar corriendo en: `http://localhost:3000`.
-
-## Rutas de la API
-
-### 1. **Agregar alimento** - `POST /api/food/add`
-
-   Permite agregar un nuevo alimento.
-
-   **URL**: `/api/food/add`
-
-   **Parámetros**:
-
-   - `name` (String) - Nombre del alimento.
-   - `price` (Number) - Precio del alimento.
-   - `image` (File) - Imagen del alimento (archivo tipo `multipart/form-data`).
-
-   **Ejemplo de Petición (Postman)**:
-
-   - Método: `POST`
-   - URL: `http://localhost:3000/api/food/add`
-   - Body: 
-     - Form-data:
-       - `name`: Pizza
-       - `price`: 15
-       - `image`: [Subir archivo de imagen]
-
-   **Respuesta Exitosa**:
-
-   ```json
-   {
-     "success": true,
-     "message": "Food Added",
-     "food": { "id": 1, "name": "Pizza", "price": 15, "image": "pizza.jpg" }
-   }
-   ```
-
-### 2. **Listar alimentos** - `GET /api/food/list`
-
-   Devuelve una lista de todos los alimentos registrados.
-
-   **URL**: `/api/food/list`
-
-   **Ejemplo de Petición (Postman)**:
-
-   - Método: `GET`
-   - URL: `http://localhost:3000/api/food/list`
-
-   **Respuesta Exitosa**:
-
-   ```json
-   [
-     {
-       "id": 1,
-       "name": "Pizza",
-       "price": 15,
-       "image": "pizza.jpg"
-     },
-     {
-       "id": 2,
-       "name": "Hamburguesa",
-       "price": 10,
-       "image": "hamburguesa.jpg"
-     }
-   ]
-   ```
-
-### 3. **Eliminar alimento** - `POST /api/food/remove`
-
-   Elimina un alimento por su ID.
-
-   **URL**: `/api/food/remove`
-
-   **Parámetros**:
-
-   - `id` (Number) - ID del alimento a eliminar.
-
-   **Ejemplo de Petición (Postman)**:
-
-   - Método: `POST`
-   - URL: `http://localhost:3000/api/food/remove`
-   - Body:
-     - raw:
-       ```json
-       {
-         "id": 1
-       }
-       ```
-
-   **Respuesta Exitosa**:
-
-   ```json
-   {
-     "success": true,
-     "message": "Food Removed"
-   }
-   ```
+6. La API estará disponible en `http://localhost:3000`.
 
 ## Estructura del Proyecto
 
 ```bash
 Backend/
-├── config/
-├── controllers/
-├── dist/
-├── middleware/
-├── models/
-├── node_modules/
-├── prisma/
-│   ├── migrations/
-│   └── schema.prisma
-├── routes/
-├── src/
-├── uploads/
-├── .env
-├── .gitignore
-├── package.json
-├── package-lock.json
-└── tsconfig.json
+├── config/                # Configuraciones principales
+│   ├── cloudinary.ts      # Configuración de Cloudinary
+│   ├── db.ts              # Configuración de la base de datos (Prisma)
+│   └── multer.ts          # Configuración de Multer
+├── controllers/           # Controladores de la API
+│   ├── cartController.ts  # Controlador para el carrito
+│   ├── foodController.ts  # Controlador para alimentos
+│   ├── orderController.ts # Controlador para órdenes
+│   ├── reservationController.ts # Controlador para reservas
+│   └── userController.ts  # Controlador para usuarios
+├── dist/                  # Código transpilado por TypeScript
+├── middleware/            # Middleware personalizados
+│   └── auth.ts            # Middleware de autenticación
+├── models/                # Modelos de datos
+│   ├── foodModel.ts       # Modelo de alimentos
+│   └── userModel.ts       # Modelo de usuarios
+├── prisma/                # Configuración de Prisma
+│   ├── migrations/        # Migraciones de la base de datos
+│   └── schema.prisma      # Definición del esquema
+├── routes/                # Definición de rutas
+│   ├── cartRoute.ts       # Rutas del carrito
+│   ├── foodRoute.ts       # Rutas de alimentos
+│   ├── orderRoute.ts      # Rutas de órdenes
+│   ├── reservationRoute.ts # Rutas de reservas
+│   └── userRoute.ts       # Rutas de usuarios
+├── src/                   # Código principal
+│   ├── app.ts             # Configuración inicial del servidor
+│   └── index.ts           # Entrada principal
+├── uploads/               # Almacenamiento temporal de imágenes
+├── .env                   # Variables de entorno
+├── .gitignore             # Archivos ignorados por Git
+├── package.json           # Configuración de dependencias
+├── package-lock.json      # Información detallada de dependencias
+├── tsconfig.json          # Configuración de TypeScript
+└── README.md              # Documentación del proyecto
 ```
+
+## Rutas Principales de la API
+
+### Alimentos
+
+- **Agregar alimento**: `POST /api/food/add`
+- **Listar alimentos**: `GET /api/food/list`
+- **Eliminar alimento**: `POST /api/food/remove`
+
+### Usuarios
+
+- **Registrar usuario**: `POST /api/user/register`
+- **Autenticar usuario**: `POST /api/user/login`
+
+### Órdenes
+
+- **Crear orden**: `POST /api/order/add`
+- **Listar órdenes**: `GET /api/order/list`
+
+### Reservas
+
+- **Crear reserva**: `POST /api/reservation/`
+- **Listar reservas**: `GET /api/reservation/`
 
 ## Cómo Probar
 
-Se recomienda utilizar **Postman** o **cURL** para hacer pruebas de las rutas. Las pruebas incluyen agregar alimentos con imágenes, listar alimentos y eliminar alimentos por su ID.
+1. Utiliza herramientas como **Postman** o **cURL** para realizar pruebas de las rutas.
+2. Asegúrate de configurar correctamente las variables de entorno para la conexión con la base de datos y Cloudinary.
 
-### Agregar alimento con Postman:
-1. Selecciona el método `POST`.
-2. Ingresa la URL `http://localhost:3000/api/food/add`.
-3. En el **Body** selecciona `form-data`.
-4. Añade los campos `name`, `price` y la imagen correspondiente (`image`).
-5. Haz clic en **Send**.
 
-### Eliminar alimento con Postman:
-1. Selecciona el método `POST`.
-2. Ingresa la URL `http://localhost:3000/api/food/remove`.
-3. En el **Body** selecciona `raw` y luego `JSON`.
-4. Introduce el JSON con el `id` del alimento:
-   ```json
-   {
-     "id": 1
-   }
-   ```
-5. Haz clic en **Send**.
+## ✨ Autores
 
-## Contribuir
-
-Si deseas contribuir a este proyecto, por favor realiza un `fork` del repositorio y envía un **pull request** con tus mejoras.
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT.
+- **[@JohanPinares](https://github.com/JohanEmersonPinares)**
+- **[@BryamAranguri](https://github.com/bryamaranguri)**
+- **[@AEperalesguevara](https://github.com/AEperalesguevara)**
 
