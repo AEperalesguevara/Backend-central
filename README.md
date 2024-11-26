@@ -1,5 +1,4 @@
-
-# Food API
+# Backend Central Restaurant (API)
 
 ## Descripción
 
@@ -12,7 +11,7 @@ La API está construida utilizando **Node.js**, **Express**, y **Prisma** como O
 - **Gestión de usuarios**: Registro y autenticación de usuarios.
 - **Órdenes y reservas**: Crear y administrar pedidos y reservas.
 - **Subida de imágenes**: Carga y gestión de imágenes utilizando Multer y Cloudinary.
--**Envio de Correos**: Envio automatico de correos al hacer una reserva.
+- **Envio de Correos**: Envio automatico de correos al hacer una reserva.
 
 ## Tecnologías Utilizadas
 
