@@ -35,7 +35,7 @@ La API está construida utilizando **Node.js**, **Express**, y **Prisma** como O
 1. Clona el repositorio:
 
    ```bash
-   git clone https://github.com/JohanEmersonPinares/Backend
+   git clone https://github.com/AEperalesguevara/Backend-central
    ```
 
 2. Instala las dependencias:
