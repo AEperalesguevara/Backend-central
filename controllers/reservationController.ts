@@ -1,7 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
+import nodemailer from "nodemailer"; // Asegúrate de tener nodemailer instalado
 
 const prisma = new PrismaClient();
+const transporter = nodemailer.createTransport({
+  service: "Gmail", // Cambia esto según el proveedor que uses
+  auth: {
+    user: process.env.EMAIL_USER, // Usar variables de entorno
+    pass: process.env.EMAIL_PASS, // Nunca guardes credenciales directamente en el código
+  },
+});
+
 export const createReservation = async (
   req: Request,
   res: Response,
@@ -41,13 +50,35 @@ export const createReservation = async (
       },
     });
 
+    // Enviar correo de confirmación
+    const emailOptions = {
+      from: process.env.EMAIL_USER, // Correo del remitente
+      to: email, // Correo del cliente
+      subject: "Confirmación de tu reserva",
+      html: `
+        <h1>Confirmación de Reserva</h1>
+        <p>Hola ${name},</p>
+        <p>Tu reserva ha sido confirmada:</p>
+        <ul>
+          <li><b>Fecha:</b> ${new Date(date).toLocaleDateString()}</li>
+          <li><b>Hora:</b> ${time}</li>
+          <li><b>Comensales:</b> ${guestsNumber}</li>
+          <li><b>Teléfono:</b> ${phone}</li>
+        </ul>
+        <p>¡Gracias por elegirnos!</p>
+      `,
+    };
+
+    await transporter.sendMail(emailOptions);
+
+    // Respuesta exitosa
     res.status(201).json({
       success: true,
-      message: "Reserva creada con éxito.",
+      message: "Reserva creada y correo enviado con éxito.",
       reservation,
     });
   } catch (error) {
-    console.error("Error al crear la reserva:", error);
+    console.error("Error al crear la reserva o enviar el correo:", error);
     next(error);
   }
 };
