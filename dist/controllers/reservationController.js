@@ -8,10 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getReservations = exports.createReservation = void 0;
 const client_1 = require("@prisma/client");
+const nodemailer_1 = __importDefault(require("nodemailer")); // Asegúrate de tener nodemailer instalado
 const prisma = new client_1.PrismaClient();
+const transporter = nodemailer_1.default.createTransport({
+    service: "Gmail", // Cambia esto según el proveedor que uses
+    auth: {
+        user: process.env.EMAIL_USER, // Usar variables de entorno
+        pass: process.env.EMAIL_PASS, // Nunca guardes credenciales directamente en el código
+    },
+});
 const createReservation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, phone, date, time, guests } = req.body;
     try {
@@ -43,14 +54,34 @@ const createReservation = (req, res, next) => __awaiter(void 0, void 0, void 0, 
                 guests: guestsNumber,
             },
         });
+        // Enviar correo de confirmación
+        const emailOptions = {
+            from: process.env.EMAIL_USER, // Correo del remitente
+            to: email, // Correo del cliente
+            subject: "Confirmación de tu reserva",
+            html: `
+        <h1>Confirmación de Reserva</h1>
+        <p>Hola ${name},</p>
+        <p>Tu reserva ha sido confirmada:</p>
+        <ul>
+          <li><b>Fecha:</b> ${new Date(date).toLocaleDateString()}</li>
+          <li><b>Hora:</b> ${time}</li>
+          <li><b>Comensales:</b> ${guestsNumber}</li>
+          <li><b>Teléfono:</b> ${phone}</li>
+        </ul>
+        <p>¡Gracias por elegirnos!</p>
+      `,
+        };
+        yield transporter.sendMail(emailOptions);
+        // Respuesta exitosa
         res.status(201).json({
             success: true,
-            message: "Reserva creada con éxito.",
+            message: "Reserva creada y correo enviado con éxito.",
             reservation,
         });
     }
     catch (error) {
-        console.error("Error al crear la reserva:", error);
+        console.error("Error al crear la reserva o enviar el correo:", error);
         next(error);
     }
 });

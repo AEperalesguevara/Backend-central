@@ -129,7 +129,7 @@ const verifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // Convertir orderId a un número
         const parsedOrderId = parseInt(orderId, 10);
         if (isNaN(parsedOrderId)) {
-            return res.json({ success: false, message: "Invalid order ID" });
+            res.json({ success: false, message: "Invalid order ID" });
         }
         if (success === "true") {
             yield prisma.order.update({
